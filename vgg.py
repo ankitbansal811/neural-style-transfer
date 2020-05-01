@@ -54,7 +54,7 @@ class Vgg16(torch.nn.Module):
                 # Comment out below three rows to keep the default MaxPool2d layers
                 if avg_pooling:
                     # Assuming that a pooling layer output will not be used in loss
-                    layer = nn.AvgPool2d(kernel_size=2, stride=2, padding=0, ceil_mode=False)
+                    layer = torch.nn.AvgPool2d(kernel_size=2, stride=2, padding=0, ceil_mode=False)
                     model.add_module(name, layer)
                     continue;
             elif isinstance(layer, torch.nn.BatchNorm2d):

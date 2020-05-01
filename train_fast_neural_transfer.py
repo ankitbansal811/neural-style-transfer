@@ -129,7 +129,7 @@ def arg_parser():
     """
     Parse input arguments and build help at the same time.
     """
-    parser = argparse.ArgumentParser(description="parser for fast-neural-style")
+    parser = argparse.ArgumentParser(description="parser for fast-neural-style training")
 
     parser.add_argument("--epochs", type=int, default=10,
                                   help="number of training epochs, default is 2")

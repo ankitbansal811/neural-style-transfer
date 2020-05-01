@@ -10,7 +10,6 @@ Image transformer as presented by Justin Johnson in Fast Neural Transfer Paper
 =========================================================================
 """
 
-import torch
 import torch.nn as nn
 
 # For model achitecture refer https://cs.stanford.edu/people/jcjohns/papers/fast-style/fast-style-supp.pdf
@@ -51,15 +50,16 @@ class Transformer(nn.Module):
         self.last_layer = nn.Conv2d(32, 3, 9, 1, 9//2)
 
     def forward(self, X):
-        if print_log: print("Input batch shape:", X.shape)
+        if self.print_log: print("Input batch shape:", X.shape)
         X = self.Downsampling(X)
-        if print_log: print("Downsampled batch shape:", X.shape)
+        if self.print_log: print("Downsampled batch shape:", X.shape)
         X = self.ResBlocks(X)
-        if print_log: print("ResBlocks batch shape:", X.shape)
+        if self.print_log: print("ResBlocks batch shape:", X.shape)
         X = self.Upsampling(X)
-        if print_log: print("Upsampled batch shape:", X.shape)
+        if self.print_log: print("Upsampled batch shape:", X.shape)
         X = self.last_layer(X)
         return X
+
 
 class Norm(nn.Module):
     """ A common normalization class to be used. 
@@ -80,7 +80,7 @@ class ConvLayer(nn.Module):
     """
     def __init__(self, in_channels, out_channels, kernel_size, stride):
         super(ConvLayer, self).__init__()
-        self.model = torch.nn.Sequential()
+        self.model = nn.Sequential()
         self.model.add_module('conv', nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding=kernel_size//2))
         self.model.add_module('norm', Norm(num_features=out_channels))
         self.model.add_module('relu', nn.ReLU())
@@ -97,7 +97,7 @@ class ResidualBlock(nn.Module):
     def __init__(self, channels):
         super(ResidualBlock, self).__init__()
 
-        self.model = torch.nn.Sequential()
+        self.model = nn.Sequential()
         # We are going to use zero-padding instead of reflection padding
         self.model.add_module('conv1', nn.Conv2d(in_channels=channels, out_channels=channels, 
                                                         kernel_size=3, stride=1, padding=1))
@@ -124,12 +124,13 @@ class UpsampleLayer(nn.Module):
         self.model = ConvLayer(in_channels, out_channels, kernel_size, stride)
         
     def forward(self, X):
-        X = torch.nn.Upsample(scale_factor=self.upsample, mode='nearest')(X)
+        X = nn.Upsample(scale_factor=self.upsample, mode='nearest')(X)
         out = self.model(X)
         return out
 
 
 if __name__ == "__main__":
+    import torch
     img = torch.randn(1, 3, 256, 256)
     model = Transformer(print_log=True)
     print(model(img).shape)

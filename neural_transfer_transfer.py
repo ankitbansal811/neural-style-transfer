@@ -61,16 +61,16 @@ content_image = img_transformer(content_image).unsqueeze(0)
 style_image = img_transformer(style_image).unsqueeze(0)
 
 
-content_feature_maps = get_image_features(vgg(content_image), content_loss_layers)
-style_feature_maps_gram = get_image_features(vgg(style_image), style_loss_layers, gram=True)
+content_feature_maps = get_image_features(vgg(utils.normalize_batch(content_image)), content_loss_layers)
+style_feature_maps_gram = get_image_features(vgg(utils.normalize_batch(style_image)), style_loss_layers, gram=True)
 
 
 input_img = content_image.clone()
 utils.imshow(input_img, title='Input Image')
 
-optimizer = torch.optim.LBFGS([input_img.requires_grad_()], lr=2)
+optimizer = torch.optim.LBFGS([input_img.requires_grad_()])
 
-epochs = 300
+epochs = 125
 content_weight, style_weight = 1, 1000000
 
 tic = time.time()
@@ -81,7 +81,7 @@ while epoch[0] < epochs:
         optimizer.zero_grad()
         input_img.data.clamp_(min=0, max=1)
 
-        input_img_vgg_forward = vgg(input_img)
+        input_img_vgg_forward = vgg(utils.normalize_batch(input_img))
         target_content_maps = get_image_features(input_img_vgg_forward, content_loss_layers)
         target_style_maps_gram = get_image_features(input_img_vgg_forward, style_loss_layers, gram=True)
 
